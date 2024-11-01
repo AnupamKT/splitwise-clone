@@ -1,11 +1,13 @@
 package com.anupam.Splitwise.service.expense;
 
+import com.anupam.Splitwise.common.SplitwiseConstants;
 import com.anupam.Splitwise.converter.expense.ExpenseConverter;
 import com.anupam.Splitwise.entity.expense.GroupExpenseEntity;
 import com.anupam.Splitwise.handler.expense.ExpenseHandler;
 import com.anupam.Splitwise.model.Response;
 import com.anupam.Splitwise.model.expense.ExpenseUpdateRequest;
 import com.anupam.Splitwise.model.expense.GroupExpense;
+import com.anupam.Splitwise.service.audit.AuditService;
 import com.anupam.Splitwise.service.settlement.SettlementService;
 import com.anupam.Splitwise.validator.expense.ExpenseValidator;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +28,8 @@ public class ExpenseService {
     private ExpenseHandler expenseHandler;
     @Autowired
     private SettlementService settlementService;
+    @Autowired
+    private AuditService auditService;
 
     public Response addExpense(GroupExpense groupExpense, UUID groupId) throws Exception {
         log.info("started addExpense for group:{}", groupId);
@@ -35,8 +39,9 @@ public class ExpenseService {
         GroupExpenseEntity expenseEntity = expenseConverter.convert(groupExpense);
         //persist
         expenseEntity = expenseHandler.addExpense(expenseEntity, groupId);
-        Response response = new Response(200, expenseEntity);
         settlementService.calculateSettlementsAsync(groupId);
+        auditService.submitAudit(groupExpense, SplitwiseConstants.AuditAction.ADD_EXPENSE,"");
+        Response response = new Response(200, expenseEntity);
         log.info("Ended addExpense for group:{}", groupId);
         return response;
     }

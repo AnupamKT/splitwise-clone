@@ -18,15 +18,15 @@ public class ExpenseSettlement {
     }
 
     public Set<SettlementsEntity> settle() {
-        int totalExpense = calculateTotalExpense(groupEntity);
+        double totalExpense = calculateTotalExpense(groupEntity);
         int totalMembers = groupEntity.getUserEntities().size();
         double perHeadShare = totalExpense / totalMembers;
         //This map contains sum of expenses by all members
-        Map<String, Integer> perPersonExpenseMap = calculatePerPersonExpense(groupEntity);
+        Map<String, Double> perPersonExpenseMap = calculatePerPersonExpense(groupEntity);
 
         //This map contains list of user and diff from perHeadShare
         Map<String, Double> settlementMap = new HashMap<>();
-        for (Map.Entry<String, Integer> entry : perPersonExpenseMap.entrySet()) {
+        for (Map.Entry<String, Double> entry : perPersonExpenseMap.entrySet()) {
 
             //if this value is positive, person will get
             //if this value is negative, person will give
@@ -70,7 +70,7 @@ public class ExpenseSettlement {
 
     private List<String> createSettlementsComments(List<String> givers, List<String> takers, Map<String, Double> settlementMap) {
         List<String> settlementsComments = new ArrayList<>();
-        while (takers.size() != 0) {
+        while (!takers.isEmpty() && !givers.isEmpty()) {
             String giver = givers.get(0);
             Double giverValue = settlementMap.get(giver) * (-1);
             String taker = takers.get(0);
@@ -96,8 +96,8 @@ public class ExpenseSettlement {
         return settlementsComments;
     }
 
-    private Map<String, Integer> calculatePerPersonExpense(GroupEntity groupEntity) {
-        Map<String, Integer> perPersonExpense;
+    private Map<String, Double> calculatePerPersonExpense(GroupEntity groupEntity) {
+        Map<String, Double> perPersonExpense;
         List<String> emailList = groupEntity.
                 getUserEntities().
                 stream().
@@ -111,18 +111,18 @@ public class ExpenseSettlement {
                         email -> email,
                         email -> expenseEntities.stream()
                                 .filter(expenseEntity -> expenseEntity.getPaidBy().equalsIgnoreCase(email))
-                                .mapToInt(expenseEntity -> expenseEntity.getAmount())
+                                .mapToDouble(expenseEntity -> expenseEntity.getAmount())
                                 .sum()
                 ));
         log.debug("Per per expense for group:{} is:{}", this.groupEntity.getGroupName(), perPersonExpense);
         return perPersonExpense;
     }
 
-    private int calculateTotalExpense(GroupEntity groupEntity) {
-        int totalExpense = groupEntity.
+    private Double calculateTotalExpense(GroupEntity groupEntity) {
+        Double totalExpense = groupEntity.
                 getExpenses().
                 stream().
-                mapToInt(expenseEntity -> expenseEntity.getAmount()).
+                mapToDouble(expenseEntity -> expenseEntity.getAmount()).
                 sum();
         log.debug("total expense for group:{} is:{}", this.groupEntity.getGroupName(), totalExpense);
         return totalExpense;

@@ -4,6 +4,7 @@ import com.anupam.Splitwise.converter.user.UserConverter;
 import com.anupam.Splitwise.entity.member.UserEntity;
 import com.anupam.Splitwise.exception.user.InvalidUserException;
 import com.anupam.Splitwise.handler.user.UserDataHandler;
+import com.anupam.Splitwise.kafka.KafkaProducerService;
 import com.anupam.Splitwise.model.Response;
 import com.anupam.Splitwise.model.member.User;
 import com.anupam.Splitwise.validator.user.UserValidator;
@@ -25,6 +26,9 @@ public class UserService {
     @Autowired
     private UserDataHandler userDataHandler;
 
+    @Autowired
+    private KafkaProducerService kafkaProducerService;
+
     public Response createUser(User user) throws Exception {
         //validation
         userValidator.validateCreateUser(user);
@@ -33,6 +37,7 @@ public class UserService {
         //persist
         userEntity = userDataHandler.createUser(userEntity);
         Response response = new Response(HttpStatus.ACCEPTED.value(), userEntity);
+        //kafkaProducerService.sendMessage("user","user created");
         return response;
     }
 

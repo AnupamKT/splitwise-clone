@@ -1,5 +1,6 @@
 package com.anupam.Splitwise.entity.group;
 
+import com.anupam.Splitwise.entity.audit.AuditEntity;
 import com.anupam.Splitwise.entity.expense.GroupExpenseEntity;
 import com.anupam.Splitwise.entity.expense.SettlementsEntity;
 import com.anupam.Splitwise.entity.member.UserEntity;
@@ -29,10 +30,16 @@ public class GroupEntity {
             inverseJoinColumns = @JoinColumn(name = "userId"))
     @JsonManagedReference
     private Set<UserEntity> userEntities = new HashSet<>();
+
     @OneToMany(mappedBy = "group",fetch = FetchType.EAGER)
     @JsonManagedReference
     private Set<GroupExpenseEntity>expenses=new HashSet<>();
+
     @OneToMany(mappedBy = "group",fetch = FetchType.EAGER)
     @JsonManagedReference
     private Set<SettlementsEntity> settlements= new HashSet<>();
+
+    @OneToMany(mappedBy ="group",fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<AuditEntity>auditEntityList= new ArrayList<>();
 }

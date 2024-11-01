@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class GroupExpense {
 
-    private Integer amount;
+    private Double amount;
     private String paidBy;
     private String description;
     @JsonIgnore

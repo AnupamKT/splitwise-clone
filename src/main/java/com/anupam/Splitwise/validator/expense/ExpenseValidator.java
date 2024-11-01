@@ -102,7 +102,7 @@ public class ExpenseValidator {
 
     private void validateUpdateRequest(GroupExpenseEntity expenseEntity, ExpenseUpdateRequest updateRequest) throws InvalidExpenseDetailsException {
         boolean isUpdateRequired = false;
-        Integer amount = updateRequest.getAmount();
+        Double amount = updateRequest.getAmount();
         String updateDescription = updateRequest.getDescription();
         String currentDescription = expenseEntity.getDescription();
         boolean isAmountEqual = amount != null && amount.equals(expenseEntity.getAmount());
@@ -121,7 +121,7 @@ public class ExpenseValidator {
     }
 
     private void validateUpdatePayload(ExpenseUpdateRequest updateRequest, GroupExpenseEntity expenseEntity) throws InvalidExpenseDetailsException {
-        Integer amount = updateRequest.getAmount();
+        Double amount = updateRequest.getAmount();
         if (amount != null && amount < 0) {
             String exceptionMsg = "amount must be greater than zero for expense id: " + expenseEntity.getExpenseId();
             log.error(exceptionMsg);

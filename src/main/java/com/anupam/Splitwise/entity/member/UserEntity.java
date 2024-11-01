@@ -29,6 +29,7 @@ public class UserEntity {
     @Column(name = "user_password")
     @JsonIgnore
     private String password;
+
     @ManyToMany(mappedBy = "userEntities", fetch = FetchType.LAZY)
     @JsonBackReference
     Set<GroupEntity> groupEntities = new HashSet<>();

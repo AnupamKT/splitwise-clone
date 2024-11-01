@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ExpenseUpdateRequest {
 
-    private Integer amount;
+    private Double amount;
     private String description;
     @JsonIgnore
     private GroupExpenseEntity expenseEntity;
