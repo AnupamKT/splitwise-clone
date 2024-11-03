@@ -12,7 +12,8 @@ import com.anupam.Splitwise.model.group.Group;
 import com.anupam.Splitwise.service.audit.AuditService;
 import com.anupam.Splitwise.service.group.GroupService;
 import com.anupam.Splitwise.validator.group.GroupValidator;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -41,9 +42,9 @@ public class GroupServiceTest {
     private GroupValidator groupValidator;
     @Mock
     private GroupConverter groupConverter;
-    private GroupEntity groupEntity;
-    private Group group;
-    private UserEntity userEntity;
+    private static GroupEntity groupEntity;
+    private static Group group;
+    private static UserEntity userEntity;
 
     private static final String GROUP_NAME = "TestGroup";
     private static final String ADMIN_NAME = "TestAdmin";
@@ -51,8 +52,8 @@ public class GroupServiceTest {
     private static final String USER_NAME = "TestUserName";
     private static final String USER_MOBILE_NUMBER = "911Test111";
 
-    @BeforeEach
-    public void setUp() {
+    @BeforeAll
+    public static void setUp() {
         groupEntity = GroupEntity.builder().
                 groupName(GROUP_NAME).
                 groupId(UUID.randomUUID()).
@@ -135,5 +136,12 @@ public class GroupServiceTest {
         });
         Mockito.verify(groupValidator, times(1)).validateGroupDetails(group);
         assertEquals("Invalid group details", exception.getMessage());
+    }
+
+    @AfterAll
+    public static void cleanup(){
+        groupEntity=null;
+        userEntity=null;
+        group=null;
     }
 }

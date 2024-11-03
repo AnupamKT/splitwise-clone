@@ -51,7 +51,7 @@ public class GroupHandler {
         String groupAdmin = groupEntity.getGroupAdmin();
         try {
             groupEntity = groupRepository.save(groupEntity);
-            log.info("group with name:{} is create successfully by:{} ", groupName, groupAdmin);
+            log.info("group with name:{} is created successfully by:{} ", groupName, groupAdmin);
             return groupEntity;
         } catch (Exception ex) {
             log.error("error occurred while creating a group with name:{} by:{} with error message:{}", groupName, groupAdmin, ex.getMessage());
