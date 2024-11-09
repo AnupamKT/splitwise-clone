@@ -60,7 +60,7 @@ public class ExpenseService {
         log.info("started ExpenseService::updateExpense for expenseId:{}", expenseId);
         expenseValidator.validateUpdateExpense(groupId, expenseId,updateRequest);
         GroupExpenseEntity expenseEntity = expenseConverter.convertUpdateRequest(updateRequest);
-        expenseEntity = expenseHandler.addExpense(expenseEntity,groupId);
+        expenseEntity = expenseHandler.updateExpense(expenseEntity);
         Response response = new Response(HttpStatus.OK.value(), expenseEntity);
         if(updateRequest.getAmount()!=null){
             settlementService.calculateSettlementsAsync(groupId);

@@ -47,4 +47,20 @@ public class ExpenseHandler {
             log.info("ended delete expense for expense id:{},total time taken is:{}", expenseId, totalTime);
         }
     }
+
+    public GroupExpenseEntity updateExpense(GroupExpenseEntity expenseEntity) {
+        log.info("started updateExpense for:{}", expenseEntity.getExpenseId());
+        long startTime = Instant.now().toEpochMilli();
+        try {
+            expenseEntity = expenseRepository.saveAndFlush(expenseEntity);
+            log.info("update expense successful for:{}", expenseEntity.getExpenseId());
+        } catch (Exception ex) {
+            log.error("error occurred while updating expense for:{} with error message:{}", expenseEntity.getExpenseId(), ex.getMessage());
+        } finally {
+            long endTime = Instant.now().toEpochMilli();
+            long totalTime = endTime - startTime;
+            log.info("Ended updateExpense for:{}, total time taken is:{}", expenseEntity.getExpenseId(), totalTime);
+        }
+        return expenseEntity;
+    }
 }
