@@ -22,7 +22,7 @@ public class GroupValidator {
             validatePayload(group);
             return validateAdminDetails(group);
         } catch (Exception ex) {
-            log.error("validation failed for group:{} with error:{}", group.getGroupName(), ex.getMessage());
+            log.error("validation failed for group with error:{}", ex.getMessage());
             throw new InvalidGroupException("Invalid group details!!" + ex.getMessage());
         }
     }
