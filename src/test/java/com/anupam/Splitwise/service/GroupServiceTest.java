@@ -11,6 +11,7 @@ import com.anupam.Splitwise.model.Response;
 import com.anupam.Splitwise.model.group.Group;
 import com.anupam.Splitwise.service.audit.AuditService;
 import com.anupam.Splitwise.service.group.GroupService;
+import com.anupam.Splitwise.util.TestUtil;
 import com.anupam.Splitwise.validator.group.GroupValidator;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -47,23 +48,12 @@ public class GroupServiceTest {
     private static UserEntity userEntity;
 
     private static final String GROUP_NAME = "TestGroup";
-    private static final String ADMIN_NAME = "TestAdmin";
-    private static final String USER_EMAIL = "test@gmail.com";
-    private static final String USER_NAME = "TestUserName";
-    private static final String USER_MOBILE_NUMBER = "911Test111";
-
-    @BeforeAll
-    public static void setUp() {
-        groupEntity = GroupEntity.builder().
-                groupName(GROUP_NAME).
-                groupId(UUID.randomUUID()).
-                groupAdmin(ADMIN_NAME).build();
-        group = new Group(GROUP_NAME, ADMIN_NAME);
-        userEntity = UserEntity.builder().email(USER_EMAIL).name(USER_NAME).mobileNumber(USER_MOBILE_NUMBER).build();
-    }
+    private static final String USER_EMAIL = "TestAdminEmail";
+    private static final UUID GRP_ID=UUID.randomUUID();
 
     @Test
     public void getGroupTest_01() throws Exception {
+        groupEntity = TestUtil.getGroupEntity(GRP_ID);
         //creating stub response when handler method will be called
         Mockito.when(handler.findGroupByName(GROUP_NAME)).thenReturn(groupEntity);
         //actual method call
@@ -91,6 +81,7 @@ public class GroupServiceTest {
 
     @Test
     public void deleteGroupTest_01() throws Exception {
+        groupEntity = TestUtil.getGroupEntity(GRP_ID);
         Mockito.when(handler.findGroupByName(GROUP_NAME)).thenReturn(groupEntity);
         Response response = groupService.deleteGroup(GROUP_NAME);
         Mockito.verify(handler, times(1)).findGroupByName(GROUP_NAME);
@@ -113,6 +104,10 @@ public class GroupServiceTest {
 
     @Test
     public void createGroupTest_01() throws Exception {
+        groupEntity = TestUtil.getGroupEntity(GRP_ID);
+        group= TestUtil.getGroup();
+        userEntity = TestUtil.getUSerEntity();
+
         Mockito.when(groupValidator.validateGroupDetails(group)).thenReturn(userEntity);
         Mockito.when(groupConverter.convert(group, userEntity)).thenReturn(groupEntity);
         Mockito.when(handler.createGroup(groupEntity)).thenReturn(groupEntity);
@@ -129,6 +124,7 @@ public class GroupServiceTest {
 
     @Test
     public void createGroupTest_02() throws InvalidGroupException {
+        group= TestUtil.getGroup();
         Mockito.when(groupValidator.validateGroupDetails(group)).
                 thenThrow(new InvalidGroupException("Invalid group details"));
         Exception exception = assertThrows(InvalidGroupException.class, () -> {
@@ -136,12 +132,5 @@ public class GroupServiceTest {
         });
         Mockito.verify(groupValidator, times(1)).validateGroupDetails(group);
         assertEquals("Invalid group details", exception.getMessage());
-    }
-
-    @AfterAll
-    public static void cleanup(){
-        groupEntity=null;
-        userEntity=null;
-        group=null;
     }
 }

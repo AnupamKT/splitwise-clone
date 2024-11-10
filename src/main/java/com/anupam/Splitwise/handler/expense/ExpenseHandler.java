@@ -48,7 +48,7 @@ public class ExpenseHandler {
         }
     }
 
-    public GroupExpenseEntity updateExpense(GroupExpenseEntity expenseEntity) {
+    public GroupExpenseEntity updateExpense(GroupExpenseEntity expenseEntity) throws Exception {
         log.info("started updateExpense for:{}", expenseEntity.getExpenseId());
         long startTime = Instant.now().toEpochMilli();
         try {
@@ -56,6 +56,7 @@ public class ExpenseHandler {
             log.info("update expense successful for:{}", expenseEntity.getExpenseId());
         } catch (Exception ex) {
             log.error("error occurred while updating expense for:{} with error message:{}", expenseEntity.getExpenseId(), ex.getMessage());
+            throw ex;
         } finally {
             long endTime = Instant.now().toEpochMilli();
             long totalTime = endTime - startTime;

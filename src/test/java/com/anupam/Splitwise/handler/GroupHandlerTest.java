@@ -4,6 +4,7 @@ import com.anupam.Splitwise.entity.group.GroupEntity;
 import com.anupam.Splitwise.exception.group.GroupNotFoundException;
 import com.anupam.Splitwise.handler.group.GroupHandler;
 import com.anupam.Splitwise.repository.group.GroupRepository;
+import com.anupam.Splitwise.util.TestUtil;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -29,20 +30,11 @@ public class GroupHandlerTest {
     private GroupHandler groupHandler;
     private static GroupEntity groupEntity;
     private static final String GROUP_NAME = "TestGroup";
-    private static final String ADMIN_NAME = "TestAdmin";
     private static final UUID GROUP_ID=UUID.randomUUID();
-
-
-    @BeforeAll
-    public static void setup(){
-        groupEntity = GroupEntity.builder().
-                groupName(GROUP_NAME).
-                groupId(GROUP_ID).
-                groupAdmin(ADMIN_NAME).build();
-    }
 
     @Test
     public void findGroupByNameTest_o1() throws Exception {
+        groupEntity = TestUtil.getGroupEntity(GROUP_ID);
         Mockito.when(groupRepository.findByGroupName(GROUP_NAME)).thenReturn(Optional.of(groupEntity));
         GroupEntity result = groupHandler.findGroupByName(GROUP_NAME);
         Mockito.verify(groupRepository,Mockito.times(1)).findByGroupName(GROUP_NAME);
@@ -60,6 +52,7 @@ public class GroupHandlerTest {
     }
     @Test
     public void findGroupByIdTest_01() throws Exception {
+        groupEntity = TestUtil.getGroupEntity(GROUP_ID);
         Mockito.when(groupRepository.findByGroupId(GROUP_ID)).thenReturn(Optional.of(groupEntity));
         GroupEntity result = groupHandler.findGroupById(GROUP_ID);
         Mockito.verify(groupRepository,Mockito.times(1)).findByGroupId(GROUP_ID);
@@ -80,6 +73,7 @@ public class GroupHandlerTest {
 
     @Test
     public void createGroupTest_01() throws Exception {
+        groupEntity = TestUtil.getGroupEntity(GROUP_ID);
         Mockito.when(groupRepository.save(groupEntity)).thenReturn(groupEntity);
         GroupEntity result = groupHandler.createGroup(groupEntity);
         Mockito.verify(groupRepository,Mockito.times(1)).save(groupEntity);
@@ -88,6 +82,7 @@ public class GroupHandlerTest {
     }
     @Test
     public void createGroupTest_02(){
+        groupEntity = TestUtil.getGroupEntity(GROUP_ID);
         String msg="error occurred while saving group:"+groupEntity.getGroupName();
         Mockito.when(groupRepository.save(groupEntity)).thenThrow(new RuntimeException(msg));
         Exception exception = assertThrows(RuntimeException.class,()->{
@@ -99,12 +94,14 @@ public class GroupHandlerTest {
 
     @Test
     public void deleteGroupTest_01() throws Exception {
+        groupEntity = TestUtil.getGroupEntity(GROUP_ID);
         groupHandler.deleteGroup(groupEntity);
         Mockito.verify(groupRepository,Mockito.times(1)).delete(groupEntity);
     }
 
     @Test
     public void deleteGroupTest_02(){
+        groupEntity = TestUtil.getGroupEntity(GROUP_ID);
         String msg="error occurred while deleting group:"+groupEntity.getGroupName();
         doThrow(new RuntimeException(msg)).when(groupRepository).delete(groupEntity);
         Exception exception = assertThrows(RuntimeException.class,()->{
@@ -112,10 +109,5 @@ public class GroupHandlerTest {
         });
         Mockito.verify(groupRepository,times(1)).delete(groupEntity);
         assertEquals(msg,exception.getMessage());
-    }
-
-    @AfterAll
-    public static void cleanUp(){
-        groupEntity=null;
     }
 }

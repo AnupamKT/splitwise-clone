@@ -11,6 +11,7 @@ import com.anupam.Splitwise.model.expense.GroupExpense;
 import com.anupam.Splitwise.service.audit.AuditService;
 import com.anupam.Splitwise.service.expense.ExpenseService;
 import com.anupam.Splitwise.service.settlement.SettlementService;
+import com.anupam.Splitwise.util.TestUtil;
 import com.anupam.Splitwise.validator.expense.ExpenseValidator;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -48,22 +49,10 @@ public class ExpenseServiceTest {
     private final UUID GROUP_ID = UUID.randomUUID();
     private final UUID EXPENSE_ID = UUID.randomUUID();
 
-    @BeforeAll
-    public static void setup() {
-        groupExpense = GroupExpense.builder().
-                amount(100.0).
-                paidBy("Test user").
-                description("Test desc").build();
-        expenseEntity = GroupExpenseEntity.builder().
-                amount(100.0).
-                paidBy("Test User").
-                description("Test").build();
-        updateRequest = new ExpenseUpdateRequest();
-
-    }
-
     @Test
     public void addExpenseTest_01() throws Exception {
+        groupExpense = TestUtil.getGroupExpense();
+        expenseEntity = TestUtil.getGroupExpenseEntity();
         Mockito.when(expenseConverter.convert(groupExpense)).thenReturn(expenseEntity);
         Mockito.when(expenseHandler.addExpense(expenseEntity, GROUP_ID)).thenReturn(expenseEntity);
         Response response = expenseService.addExpense(groupExpense, GROUP_ID);
@@ -73,12 +62,12 @@ public class ExpenseServiceTest {
                 submitAudit(groupExpense, SplitwiseConstants.AuditAction.ADD_EXPENSE, "");
         assertNotNull(response);
         assertEquals(200, response.getStatus());
-        assertEquals("Test User", expenseEntity.getPaidBy());
+        assertEquals("Test user", expenseEntity.getPaidBy());
     }
 
     @Test
     public void addExpenseTest_02() throws Exception {
-
+        groupExpense = TestUtil.getGroupExpense();
         doThrow(new InvalidExpenseDetailsException("Invalid expense details!!")).
                 when(expenseValidator).validateExpense(groupExpense, GROUP_ID);
         Exception exception = assertThrows(InvalidExpenseDetailsException.class, () -> {
@@ -89,6 +78,8 @@ public class ExpenseServiceTest {
 
     @Test
     public void addExpenseTest_03() throws Exception {
+        groupExpense = TestUtil.getGroupExpense();
+        expenseEntity = TestUtil.getGroupExpenseEntity();
         Mockito.when(expenseConverter.convert(groupExpense)).thenReturn(expenseEntity);
         Mockito.when(expenseHandler.addExpense(expenseEntity, GROUP_ID)).
                 thenThrow(new RuntimeException("error occurred while adding expense"));
@@ -132,6 +123,7 @@ public class ExpenseServiceTest {
 
     @Test
     public void updateExpenseTest_01() throws Exception {
+        updateRequest = new ExpenseUpdateRequest();
         updateRequest.setDescription("Test desc");
         updateRequest.setAmount(100.0);
         Mockito.when(expenseConverter.convertUpdateRequest(updateRequest)).thenReturn(expenseEntity);
@@ -144,6 +136,7 @@ public class ExpenseServiceTest {
 
     @Test
     public void updateExpenseTest_02() throws Exception {
+        updateRequest = new ExpenseUpdateRequest();
         updateRequest.setDescription("Test desc");
         Mockito.when(expenseConverter.convertUpdateRequest(updateRequest)).thenReturn(expenseEntity);
         Mockito.when(expenseHandler.updateExpense(expenseEntity)).thenReturn(expenseEntity);
@@ -154,6 +147,7 @@ public class ExpenseServiceTest {
 
     @Test
     public void updateExpenseTest_03() throws InvalidExpenseDetailsException {
+        updateRequest = new ExpenseUpdateRequest();
         updateRequest.setAmount(100.0);
         updateRequest.setDescription("Test desc");
         doThrow(new InvalidExpenseDetailsException("error occurred while validating update expense")).
@@ -165,7 +159,8 @@ public class ExpenseServiceTest {
     }
 
     @Test
-    public void updateExpenseTest_04() throws InvalidExpenseDetailsException {
+    public void updateExpenseTest_04() throws Exception {
+        updateRequest = new ExpenseUpdateRequest();
         updateRequest.setAmount(100.0);
         updateRequest.setDescription("Test desc");
         Mockito.when(expenseConverter.convertUpdateRequest(updateRequest)).thenReturn(expenseEntity);
@@ -178,12 +173,4 @@ public class ExpenseServiceTest {
                 validateUpdateExpense(GROUP_ID, EXPENSE_ID, updateRequest);
         assertEquals("error occurred while updating expense", exception.getMessage());
     }
-
-    @AfterAll
-    public static void cleanUp() {
-        groupExpense = null;
-        expenseEntity = null;
-        updateRequest = null;
-    }
-
 }

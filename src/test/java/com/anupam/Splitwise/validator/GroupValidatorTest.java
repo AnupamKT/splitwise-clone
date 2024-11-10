@@ -4,6 +4,7 @@ import com.anupam.Splitwise.entity.member.UserEntity;
 import com.anupam.Splitwise.exception.group.InvalidGroupException;
 import com.anupam.Splitwise.handler.user.UserDataHandler;
 import com.anupam.Splitwise.model.group.Group;
+import com.anupam.Splitwise.util.TestUtil;
 import com.anupam.Splitwise.validator.group.GroupValidator;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,14 +26,10 @@ public class GroupValidatorTest {
     private UserEntity userEntity;
     private static String EMAIL="TestAdminEmail";
 
-    @BeforeEach
-    public void setUp(){
-        group= new Group("Test group",EMAIL);
-        userEntity = UserEntity.builder().email(EMAIL).name("Test name").build();
-    }
-
     @Test
     public void validateGroupDetailsTest_01() throws Exception {
+        group = TestUtil.getGroup();
+        userEntity = TestUtil.getUSerEntity();
         Mockito.when(userDataHandler.findUserByEmail(EMAIL)).thenReturn(userEntity);
         UserEntity result = groupValidator.validateGroupDetails(group);
         assertNotNull(result);
@@ -40,6 +37,7 @@ public class GroupValidatorTest {
     }
     @Test
     public void validateGroupDetailsTest_02() throws Exception {
+        group = TestUtil.getGroup();
         Mockito.when(userDataHandler.findUserByEmail(EMAIL)).
                 thenThrow(new InvalidGroupException("not a valid admin"));
         Exception exception = assertThrows(InvalidGroupException.class,()->{
@@ -59,8 +57,9 @@ public class GroupValidatorTest {
 
     @Test
     public void validateGroupDetailsTest_04(){
-     group.setGroupName("");
-     Exception exception = assertThrows(InvalidGroupException.class,()->{
+        group = TestUtil.getGroup();
+        group.setGroupName("");
+        Exception exception = assertThrows(InvalidGroupException.class,()->{
         groupValidator.validateGroupDetails(group);
      });
         assertTrue(exception.getMessage().contains("Group name cannot be null or blank"));
@@ -68,16 +67,11 @@ public class GroupValidatorTest {
 
     @Test
     public void validateGroupDetailsTest_05(){
+        group = TestUtil.getGroup();
         group.setGroupAdminEmail("");
         Exception exception = assertThrows(InvalidGroupException.class,()->{
             groupValidator.validateGroupDetails(group);
         });
         assertTrue(exception.getMessage().contains("Group Admin email cannot be null or blank"));
-    }
-
-    @AfterEach
-    public void cleanUp(){
-        group=null;
-        userEntity=null;
     }
 }
